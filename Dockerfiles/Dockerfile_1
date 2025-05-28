@@ -1,0 +1,10 @@
+FROM ubuntu:18.04
+RUN apt-get update && apt-get install nginx -y
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+
+# docker image build -t meu-nginx:1.0 .
+# docker image ls
+# docker container run -d -p 8080:80 --name meu-nginx meu-nginx:1.0
+# docker container ls
+# ip -a
