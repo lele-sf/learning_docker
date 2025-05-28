@@ -52,20 +52,48 @@ O Dockerfile abaixo serve para criar uma imagem personalizada baseada no Ubuntu 
 
 ```dockerfile
 FROM ubuntu:18.04
+LABEL maintainer="email@gmail.com"
 RUN apt-get update && apt-get install nginx -y
 EXPOSE 80
 COPY index.html /var/www/html/
-CMD ["nginx", "-g", "daemon off;"]
+ENTRYPOINT ["nginx"]
+CMD ["-g", "daemon off;"]
 WORKDIR /var/www/html
-ENV APP_VERSION 1.0.0
+ENV APP_VERSION=1.0.0
 ```
 - **FROM**: especifica a imagem base a ser utilizada (neste caso, o Ubuntu 18.04).
+- **LABEL**: adiciona metadados à imagem, como o autor e a descrição.
 - **RUN**: executa comandos no momento da construção da imagem. Aqui, atualiza os repositórios e instala o Nginx.
 - **EXPOSE**: informa ao Docker que a aplicação dentro do container escutará na porta 80.
 - **COPY**: copia o arquivo `index.html` do diretório atual do host para o diretório `/var/www/html/` dentro do container.
-- **CMD**: define o comando padrão a ser executado quando o container for iniciado. O parâmetro `daemon off`; faz com que o Nginx rode em primeiro plano, o que é necessário para que o container continue em execução.
+- **ENTRYPOINT**: define o comando que será executado quando o container for iniciado. Neste caso, inicia o Nginx.
+- **CMD**: fornece argumentos adicionais para o comando definido em `ENTRYPOINT`. Aqui, o Nginx é configurado para rodar em primeiro plano (`daemon off`).
 - **WORKDIR**: define o diretório de trabalho dentro do container. Todos os comandos subsequentes serão executados a partir deste diretório.
 - **ENV**: define uma variável de ambiente dentro do container, neste caso, `APP_VERSION` com o valor `1.0.0`.
+
+### CMD vs ENTRYPOINT
+Ambas as instruções definem o que é executado quando um container inicia, mas funcionam de maneira diferente:
+
+- **CMD**:
+  - Define comandos e/ou argumentos padrão que são facilmente substituídos
+  - Quando você executa `docker run imagem [arg]`, o argumento substitui completamente o CMD
+  - Usado para definir comportamentos padrão que podem ser alterados
+
+- **ENTRYPOINT**:
+  - Define o executável principal que sempre será executado
+  - Não é facilmente substituído (requer flag `--entrypoint`)
+  - Garante que uma aplicação específica seja sempre executada
+
+- **Uso combinado**: quando ambos estão presentes, o ENTRYPOINT define o executável e o CMD fornece os argumentos padrão.
+
+**Exemplo**:
+```dockerfile
+ENTRYPOINT ["nginx"]  # executável fixo
+CMD ["-g", "daemon off;"]  # args que podem ser substituídos
+```
+
+- Se executar `docker run imagem` → executa `nginx -g daemon off;`
+- Se executar `docker run imagem -v` → executa `nginx -v`
 
 ## Glossário de Termos
 - **kernel**: é o núcleo do sistema operacional, responsável por gerenciar os recursos do sistema e permitir a comunicação entre o hardware e o software.
