@@ -55,21 +55,25 @@ FROM ubuntu:18.04
 LABEL maintainer="email@gmail.com"
 RUN apt-get update && apt-get install nginx -y
 EXPOSE 80
+ADD node_exporter-1.9.1.darwin-amd64.tar.gz /root/node_exporter
 COPY index.html /var/www/html/
 ENTRYPOINT ["nginx"]
 CMD ["-g", "daemon off;"]
 WORKDIR /var/www/html
 ENV APP_VERSION=1.0.0
+HEALTHCHECK --timeout=2s CMD curl -f localhost || exit 1
 ```
 - **FROM**: especifica a imagem base a ser utilizada (neste caso, o Ubuntu 18.04).
 - **LABEL**: adiciona metadados à imagem, como o autor e a descrição.
 - **RUN**: executa comandos no momento da construção da imagem. Aqui, atualiza os repositórios e instala o Nginx.
 - **EXPOSE**: informa ao Docker que a aplicação dentro do container escutará na porta 80.
+- **ADD**: adiciona o arquivo `node_exporter.tar.gz` ao diretório `/root/node_exporter` dentro do container. O comando `ADD` também pode descompactar arquivos tar automaticamente. E se o arquivo for um URL, ele será baixado.
 - **COPY**: copia o arquivo `index.html` do diretório atual do host para o diretório `/var/www/html/` dentro do container.
 - **ENTRYPOINT**: define o comando que será executado quando o container for iniciado. Neste caso, inicia o Nginx.
 - **CMD**: fornece argumentos adicionais para o comando definido em `ENTRYPOINT`. Aqui, o Nginx é configurado para rodar em primeiro plano (`daemon off`).
 - **WORKDIR**: define o diretório de trabalho dentro do container. Todos os comandos subsequentes serão executados a partir deste diretório.
 - **ENV**: define uma variável de ambiente dentro do container, neste caso, `APP_VERSION` com o valor `1.0.0`.
+- **HEALTHCHECK**: define um comando para verificar a saúde do container. Neste caso, verifica se o serviço está respondendo na porta 80 usando `curl`. Se o comando falhar, o container é considerado não saudável.
 
 ### CMD vs ENTRYPOINT
 Ambas as instruções definem o que é executado quando um container inicia, mas funcionam de maneira diferente:
