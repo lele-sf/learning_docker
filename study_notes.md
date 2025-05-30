@@ -31,8 +31,9 @@ No contexto do Docker, o CoW é usado para gerenciar as camadas (layers) dos con
 Quando um arquivo ou recurso precisa ser alterado, ele é copiado da camada read-only para a camada read-write, onde as modificações são aplicadas. Isso torna o Docker eficiente, pois evita duplicação desnecessária de dados e permite que múltiplos containers compartilhem as mesmas camadas base.
 
 ## Comandos Docker
+- **docker build -t <image_name> .**: cria uma imagem Docker a partir de um Dockerfile localizado no diretório atual. O parâmetro `-t` atribui um nome à imagem.
 - **docker container run --name <container_name> <image_name>**: cria e inicia um novo container a partir de uma imagem especificada.
-  - **-it**: executa o container em modo interativo, permitindo acesso ao terminal do container.
+  - **-it**: combina `-i` (modo interativo) e `-t` (aloca um terminal), permitindo acesso interativo ao terminal do container.
   - **-d**: executa o container em segundo plano (modo "detached").
 - **docker container rm -f <container_name>**: remove um container, mesmo que ele esteja em execução. O parâmetro `-f` força a remoção.
 - **docker container ls -a**: lista todos os containers, incluindo os que estão parados.
@@ -60,6 +61,7 @@ COPY index.html /var/www/html/
 ENTRYPOINT ["nginx"]
 CMD ["-g", "daemon off;"]
 WORKDIR /var/www/html
+VOLUME /var/www/html
 ENV APP_VERSION=1.0.0
 HEALTHCHECK --timeout=2s CMD curl -f localhost || exit 1
 ```
@@ -72,6 +74,7 @@ HEALTHCHECK --timeout=2s CMD curl -f localhost || exit 1
 - **ENTRYPOINT**: define o comando que será executado quando o container for iniciado. Neste caso, inicia o Nginx.
 - **CMD**: fornece argumentos adicionais para o comando definido em `ENTRYPOINT`. Aqui, o Nginx é configurado para rodar em primeiro plano (`daemon off`).
 - **WORKDIR**: define o diretório de trabalho dentro do container. Todos os comandos subsequentes serão executados a partir deste diretório.
+- **VOLUME**: cria um ponto de montagem para persistência de dados. Neste caso, o diretório `/var/www/html` é montado como um volume, permitindo que os dados sejam preservados mesmo se o container for removido.
 - **ENV**: define uma variável de ambiente dentro do container, neste caso, `APP_VERSION` com o valor `1.0.0`.
 - **HEALTHCHECK**: define um comando para verificar a saúde do container. Neste caso, verifica se o serviço está respondendo na porta 80 usando `curl`. Se o comando falhar, o container é considerado não saudável.
 
