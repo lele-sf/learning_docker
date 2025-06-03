@@ -1,11 +1,10 @@
-FROM ubuntu:18.04
-LABEL maintainer="email@gmail.com"
-RUN apt-get update && apt-get install nginx curl -y
-EXPOSE 80
-ADD node_exporter-1.9.1.darwin-amd64.tar.gz /root/node_exporter
-COPY index.html /var/www/html/
-WORKDIR /var/www/html
-ENV APP_VERSION=1.0.0
-ENTRYPOINT ["nginx"]
-CMD ["-g", "daemon off;"]
-HEALTHCHECK --timeout=2s CMD curl -f localhost || exit 1
+FROM golang:1.18 AS buildando
+WORKDIR /app
+COPY . ./
+RUN go mod init hello
+RUN go build -o /app/hello
+
+FROM alpine:3.15.9
+COPY --from=buildando /app/hello /app/hello
+
+CMD ["/app/hello"]
