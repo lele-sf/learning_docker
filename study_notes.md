@@ -102,5 +102,30 @@ CMD ["-g", "daemon off;"]  # args que podem ser substituídos
 - Se executar `docker run imagem` → executa `nginx -g daemon off;`
 - Se executar `docker run imagem -v` → executa `nginx -v`
 
+### Multistage Build no Dockerfile
+O **Multistage Build** é uma técnica no Docker que permite criar imagens mais eficientes e leves, dividindo o processo de construção em várias etapas.
+
+Isso é especialmente útil para projetos que requerem compilação, como aplicações em Go, Java ou Node.js. A ideia é usar uma imagem temporária para compilar o código e, em seguida, copiar apenas os artefatos necessários para a imagem final.
+
+**Como funciona**: 
+O multistage permite usar `múltiplas instruções FROM` no mesmo Dockerfile, cada uma representando uma etapa de construção. A imagem final é construída a partir da última etapa, mas pode copiar arquivos de etapas anteriores.
+
+**Exemplo**:
+```dockerfile
+# Etapa de construção
+FROM golang:1.20 AS builder
+WORKDIR /app
+COPY . ./
+RUN go mod init hello
+RUN go build -o /app/hello
+
+# Etapa final
+FROM alpine:latest
+COPY --from=builder /app/hello /app/hello
+CMD ["/app/hello"]
+``` 
+Neste exemplo, a primeira etapa usa a imagem do Go para compilar o código, enquanto a segunda etapa usa uma imagem mais leve (Alpine) para criar a imagem final, contendo apenas o binário compilado. Isso reduz significativamente o tamanho da imagem final, pois não inclui todas as dependências de compilação.
+
 ## Glossário de Termos
 - **kernel**: é o núcleo do sistema operacional, responsável por gerenciar os recursos do sistema e permitir a comunicação entre o hardware e o software.
+- **Docker Hub**: repositório público onde usuários podem compartilhar e baixar imagens Docker.
