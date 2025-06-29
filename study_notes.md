@@ -126,6 +126,42 @@ CMD ["/app/hello"]
 ``` 
 Neste exemplo, a primeira etapa usa a imagem do Go para compilar o código, enquanto a segunda etapa usa uma imagem mais leve (Alpine) para criar a imagem final, contendo apenas o binário compilado. Isso reduz significativamente o tamanho da imagem final, pois não inclui todas as dependências de compilação.
 
+### Imagens Distroless
+
+Imagens **Distroless** são imagens de container que não incluem uma distribuição Linux completa, apenas o mínimo necessário para rodar a aplicação (runtime e dependências). Elas não possuem shell, gerenciadores de pacotes ou utilitários do sistema operacional.
+
+**Vantagens:**
+- Imagens muito menores
+- Menos vulnerabilidades de segurança (menos componentes expostos)
+- Deploys mais rápidos
+
+**Desvantagens:**
+- Não possuem shell ou ferramentas para depuração dentro do container
+- Exigem mais atenção às dependências da aplicação
+
+**Como usar:**  
+Você pode usar imagens distroless como base no seu Dockerfile, por exemplo:
+
+```dockerfile
+FROM golang:1.20 AS build
+WORKDIR /app
+COPY . .
+RUN go build -o hello
+
+FROM gcr.io/distroless/base
+COPY --from=build /app/hello /
+CMD ["/hello"]
+```
+
+#### Implementando Distroless
+
+Existem várias maneiras de adotar uma estratégia Distroless. As mais comuns são utilizar imagens base já prontas, como:
+
+- [Google Distroless](https://github.com/GoogleContainerTools/distroless): imagens minimalistas mantidas pelo Google, muito usadas para aplicações em Go, Java, Node.js, Python, entre outras.
+- [Chainguard Images](https://edu.chainguard.dev/chainguard/chainguard-images/about/getting-started-distroless/): imagens modernas, seguras e também minimalistas, com versões para várias linguagens (ex: Python, Node, Java).
+
+Essas imagens já vêm preparadas para produção, sem shell ou utilitários extras, e são ideais para quem busca máxima segurança e eficiência.
+
 ## Glossário de Termos
 - **kernel**: é o núcleo do sistema operacional, responsável por gerenciar os recursos do sistema e permitir a comunicação entre o hardware e o software.
 - [**Docker Hub**](https://hub.docker.com/): repositório público onde usuários podem compartilhar e baixar imagens Docker.
