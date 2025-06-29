@@ -128,4 +128,4 @@ Neste exemplo, a primeira etapa usa a imagem do Go para compilar o código, enqu
 
 ## Glossário de Termos
 - **kernel**: é o núcleo do sistema operacional, responsável por gerenciar os recursos do sistema e permitir a comunicação entre o hardware e o software.
-- **Docker Hub**: repositório público onde usuários podem compartilhar e baixar imagens Docker.
+- [**Docker Hub**](https://hub.docker.com/): repositório público onde usuários podem compartilhar e baixar imagens Docker.
