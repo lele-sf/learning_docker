@@ -1,0 +1,14 @@
+services:
+  redis:
+    image: redis
+    ports:
+      - "6380:6379"
+  app:
+    build: .
+    image: lelesf/giropops-senhas:4.0
+    environment:
+      - REDIS_HOST=redis
+    ports:
+      - "5000:5000"
+    depends_on:
+      - redis
