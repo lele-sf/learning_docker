@@ -162,6 +162,24 @@ Existem várias maneiras de adotar uma estratégia Distroless. As mais comuns s�
 
 Essas imagens já vêm preparadas para produção, sem shell ou utilitários extras, e são ideais para quem busca máxima segurança e eficiência.
 
+### Scanner de Vulnerabilidades em Imagens
+
+Garantir a segurança das imagens de container é fundamental, já que vulnerabilidades presentes nas camadas ou pacotes podem comprometer toda a aplicação. Para isso, existem ferramentas especializadas que analisam imagens e apontam possíveis falhas de segurança.
+
+#### Docker Scout
+
+O [**Docker Scout**](https://docs.docker.com/scout/) é uma ferramenta oficial do Docker para análise de vulnerabilidades em imagens. Ele gera um inventário completo dos pacotes (SBOM - Software Bill of Materials) e compara com bancos de dados de vulnerabilidades atualizados. O Scout pode ser usado via Docker Desktop, Docker Hub, linha de comando (`docker scout cves`), ou integrado a pipelines CI/CD. Ele mostra CVEs, recomendações de correção e permite comparar imagens.
+
+#### Trivy
+
+O [**Trivy**](https://trivy.dev/latest/getting-started/) é uma ferramenta open source muito popular para escanear vulnerabilidades em imagens de container, arquivos, repositórios de código e até configurações de infraestrutura como código. Ele é simples de usar, rápido e pode ser integrado facilmente em pipelines de CI/CD.
+
+Exemplo de uso do Trivy:
+```sh
+trivy image nome-da-imagem
+```
+O Trivy também suporta análise de arquivos Dockerfile, repositórios Git e diretórios locais.
+
 ## Glossário de Termos
 - **kernel**: é o núcleo do sistema operacional, responsável por gerenciar os recursos do sistema e permitir a comunicação entre o hardware e o software.
 - [**Docker Hub**](https://hub.docker.com/): repositório público onde usuários podem compartilhar e baixar imagens Docker.
