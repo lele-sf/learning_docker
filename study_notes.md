@@ -31,10 +31,12 @@ No contexto do Docker, o CoW é usado para gerenciar as camadas (layers) dos con
 Quando um arquivo ou recurso precisa ser alterado, ele é copiado da camada read-only para a camada read-write, onde as modificações são aplicadas. Isso torna o Docker eficiente, pois evita duplicação desnecessária de dados e permite que múltiplos containers compartilhem as mesmas camadas base.
 
 ## Comandos Docker
-- **docker build -t <image_name> .**: cria uma imagem Docker a partir de um Dockerfile localizado no diretório atual. O parâmetro `-t` atribui um nome à imagem.
+- **docker build -t <image_name> .**: cria uma imagem Docker a partir de um Dockerfile localizado no diretório atual.
+  - **-t**: atribui um nome à imagem, no formato `repositorio:tag`. Se a tag não for especificada, o padrão é `latest`.
 - **docker container run --name <container_name> <image_name>**: cria e inicia um novo container a partir de uma imagem especificada.
   - **-it**: combina `-i` (modo interativo) e `-t` (aloca um terminal), permitindo acesso interativo ao terminal do container.
   - **-d**: executa o container em segundo plano (modo "detached").
+  - **-p <host_port>:<container_port>**: mapeia uma porta do host para uma porta do container, permitindo acesso externo ao serviço rodando no container.
 - **docker container rm -f <container_name>**: remove um container, mesmo que ele esteja em execução. O parâmetro `-f` força a remoção.
 - **docker container ls -a**: lista todos os containers, incluindo os que estão parados.
 - **docker container start/stop/pause/unpause <container_name>**: inicia, para, pausa ou retoma um container em execução.
