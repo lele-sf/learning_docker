@@ -182,6 +182,32 @@ trivy image nome-da-imagem
 ```
 O Trivy também suporta análise de arquivos Dockerfile, repositórios Git e diretórios locais.
 
+### Cosign e a Importância de Assinar Imagens
+
+Garantir a integridade e a autoria das imagens de container é fundamental para a segurança em ambientes de produção. Ferramentas como o [**Cosign**](https://docs.sigstore.dev/cosign/overview/) permitem **assinar digitalmente** imagens de container, comprovando que elas não foram alteradas e que realmente foram criadas por quem afirma tê-las criado.
+
+**Por que assinar imagens?**
+- Evita o uso de imagens adulteradas ou maliciosas.
+- Permite verificar a procedência da imagem antes do deploy.
+- Facilita auditorias e conformidade em ambientes corporativos.
+
+**Como funciona o Cosign?**
+O Cosign gera uma assinatura digital para a imagem e armazena essa assinatura no próprio registro de imagens (como Docker Hub, GitHub Container Registry, etc). Antes de usar ou implantar uma imagem, é possível verificar a assinatura para garantir sua autenticidade.
+
+**Exemplo básico de uso:**
+```sh
+# Gerar um par de chaves
+cosign generate-key-pair
+
+# Assinar uma imagem
+cosign sign --key cosign.key usuario/imagem:tag
+
+# Verificar a assinatura
+cosign verify --key cosign.pub usuario/imagem:tag
+```
+
+O uso de assinaturas digitais em imagens é uma prática recomendada para aumentar a segurança da cadeia de suprimentos de software (supply chain security) e evitar ataques como o "supply chain attack".
+
 ## Glossário de Termos
 - **kernel**: é o núcleo do sistema operacional, responsável por gerenciar os recursos do sistema e permitir a comunicação entre o hardware e o software.
 - [**Docker Hub**](https://hub.docker.com/): repositório público onde usuários podem compartilhar e baixar imagens Docker.
