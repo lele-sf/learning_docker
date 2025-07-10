@@ -104,7 +104,7 @@ CMD ["-g", "daemon off;"]  # args que podem ser substituídos
 - Se executar `docker run imagem` → executa `nginx -g daemon off;`
 - Se executar `docker run imagem -v` → executa `nginx -v`
 
-### Multistage Build no Dockerfile
+## Multistage Build no Dockerfile
 O **Multistage Build** é uma técnica no Docker que permite criar imagens mais eficientes e leves, dividindo o processo de construção em várias etapas.
 
 Isso é especialmente útil para projetos que requerem compilação, como aplicações em Go, Java ou Node.js. A ideia é usar uma imagem temporária para compilar o código e, em seguida, copiar apenas os artefatos necessários para a imagem final.
@@ -128,7 +128,7 @@ CMD ["/app/hello"]
 ``` 
 Neste exemplo, a primeira etapa usa a imagem do Go para compilar o código, enquanto a segunda etapa usa uma imagem mais leve (Alpine) para criar a imagem final, contendo apenas o binário compilado. Isso reduz significativamente o tamanho da imagem final, pois não inclui todas as dependências de compilação.
 
-### Imagens Distroless
+## Imagens Distroless
 
 Imagens **Distroless** são imagens de container que não incluem uma distribuição Linux completa, apenas o mínimo necessário para rodar a aplicação (runtime e dependências). Elas não possuem shell, gerenciadores de pacotes ou utilitários do sistema operacional.
 
@@ -155,7 +155,7 @@ COPY --from=build /app/hello /
 CMD ["/hello"]
 ```
 
-#### Implementando Distroless
+### Implementando Distroless
 
 Existem várias maneiras de adotar uma estratégia Distroless. As mais comuns são utilizar imagens base já prontas, como:
 
@@ -164,15 +164,15 @@ Existem várias maneiras de adotar uma estratégia Distroless. As mais comuns s�
 
 Essas imagens já vêm preparadas para produção, sem shell ou utilitários extras, e são ideais para quem busca máxima segurança e eficiência.
 
-### Scanner de Vulnerabilidades em Imagens
+## Scanner de Vulnerabilidades em Imagens
 
 Garantir a segurança das imagens de container é fundamental, já que vulnerabilidades presentes nas camadas ou pacotes podem comprometer toda a aplicação. Para isso, existem ferramentas especializadas que analisam imagens e apontam possíveis falhas de segurança.
 
-#### Docker Scout
+### Docker Scout
 
 O [**Docker Scout**](https://docs.docker.com/scout/) é uma ferramenta oficial do Docker para análise de vulnerabilidades em imagens. Ele gera um inventário completo dos pacotes (SBOM - Software Bill of Materials) e compara com bancos de dados de vulnerabilidades atualizados. O Scout pode ser usado via Docker Desktop, Docker Hub, linha de comando (`docker scout cves`), ou integrado a pipelines CI/CD. Ele mostra CVEs, recomendações de correção e permite comparar imagens.
 
-#### Trivy
+### Trivy
 
 O [**Trivy**](https://trivy.dev/latest/getting-started/) é uma ferramenta open source muito popular para escanear vulnerabilidades em imagens de container, arquivos, repositórios de código e até configurações de infraestrutura como código. Ele é simples de usar, rápido e pode ser integrado facilmente em pipelines de CI/CD.
 
@@ -182,7 +182,7 @@ trivy image nome-da-imagem
 ```
 O Trivy também suporta análise de arquivos Dockerfile, repositórios Git e diretórios locais.
 
-### Cosign e a Importância de Assinar Imagens
+## Cosign e a Importância de Assinar Imagens
 
 Garantir a integridade e a autoria das imagens de container é fundamental para a segurança em ambientes de produção. Ferramentas como o [**Cosign**](https://docs.sigstore.dev/cosign/overview/) permitem **assinar digitalmente** imagens de container, comprovando que elas não foram alteradas e que realmente foram criadas por quem afirma tê-las criado.
 
@@ -207,6 +207,104 @@ cosign verify --key cosign.pub usuario/imagem:tag
 ```
 
 O uso de assinaturas digitais em imagens é uma prática recomendada para aumentar a segurança da cadeia de suprimentos de software (supply chain security) e evitar ataques como o "supply chain attack".
+
+## Volumes no Docker
+
+Volumes são mecanismos para persistir e compartilhar dados entre containers ou entre containers e o host. Eles resolvem um problema fundamental: o sistema de arquivos dos containers é **efêmero** - quando um container é removido, todos os dados não persistidos são perdidos.
+
+### Por que usar volumes?
+
+- **Persistência de dados**: banco de dados, uploads, configurações e logs são preservados mesmo quando o container é destruído
+- **Compartilhamento**: facilita a troca de dados entre containers ou entre host e container
+- **Performance**: em alguns casos, volumes oferecem melhor desempenho do que a escrita no sistema de arquivos do container
+- **Portabilidade**: volumes gerenciados pelo Docker funcionam em qualquer ambiente Docker
+
+### Tipos de montagem para persistência de dados
+
+O Docker suporta dois tipos principais de montagem para persistência de dados:
+
+#### 1. Bind Mounts
+
+Monta um arquivo ou diretório específico do host diretamente no container.
+
+**Características:**
+- Liga diretamente um caminho do host a um caminho no container
+- Ideal para desenvolvimento quando precisa compartilhar código-fonte
+- Depende da estrutura de diretórios do host
+- Permite acesso completo a arquivos do host a partir do container
+
+**Exemplos:**
+
+Com `--mount` (sintaxe explícita e recomendada):
+```sh
+# Monte um diretório do host no container
+docker container run -ti --mount type=bind,src=/home/user/projeto,target=/app ubuntu
+
+# Montagem somente leitura (read-only)
+docker container run -ti --mount type=bind,src=/home/user/configs,target=/etc/configs,ro ubuntu
+```
+
+Com `-v` (sintaxe abreviada):
+```sh
+docker run -v /home/user/projeto:/app ubuntu
+```
+
+#### 2. Volumes Docker
+
+Volumes são áreas de armazenamento gerenciadas pelo Docker, independentes da estrutura de diretórios do host.
+
+**Características:**
+- Gerenciados pelo Docker (armazenados em `/var/lib/docker/volumes/`)
+- Independentes da estrutura do host (mais portáveis)
+- Podem ser facilmente copiados, compartilhados e migrados
+- Suportam drivers de armazenamento para funcionamento com sistemas de armazenamento remoto
+- Recomendados para uso em produção
+
+**Gerenciando volumes:**
+
+```sh
+# Criar um volume
+docker volume create app_data
+
+# Listar volumes
+docker volume ls
+
+# Inspecionar detalhes
+docker volume inspect app_data
+
+# Remover um volume
+docker volume rm app_data
+
+# Remover volumes não utilizados (cuidado!)
+docker volume prune
+```
+
+**Montando volumes:**
+
+Com `--mount` (sintaxe explícita):
+```sh
+docker container run -d --mount type=volume,source=app_data,target=/data nginx
+```
+
+Com `-v` (sintaxe abreviada):
+```sh
+docker container run -d -v app_data:/data nginx
+```
+
+Se o volume não existir, o Docker o cria automaticamente quando solicitado.
+
+### Comparação: Bind Mounts vs Volumes Docker
+
+| Característica | Bind Mounts | Volumes Docker |
+|----------------|-------------|---------------|
+| **Localização** | Qualquer lugar no host | `/var/lib/docker/volumes/` |
+| **Gerenciamento** | Manual | Automático pelo Docker |
+| **Ideal para** | Desenvolvimento, compartilhamento de arquivos | Produção, persistência de dados |
+| **Portabilidade** | Baixa (depende da estrutura do host) | Alta (independente do host) |
+| **Compartilhamento** | Entre host e containers | Entre containers |
+| **Segurança** | Pode expor arquivos do sistema | Mais isolado e seguro |
+
+
 
 ## Glossário de Termos
 - **kernel**: é o núcleo do sistema operacional, responsável por gerenciar os recursos do sistema e permitir a comunicação entre o hardware e o software.
