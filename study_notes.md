@@ -275,7 +275,7 @@ docker volume inspect app_data
 # Remover um volume
 docker volume rm app_data
 
-# Remover volumes não utilizados (cuidado!)
+# Remover volumes não utilizados
 docker volume prune
 ```
 
@@ -304,6 +304,41 @@ Se o volume não existir, o Docker o cria automaticamente quando solicitado.
 | **Compartilhamento** | Entre host e containers | Entre containers |
 | **Segurança** | Pode expor arquivos do sistema | Mais isolado e seguro |
 
+## Redes no Docker
+
+As redes no Docker permitem que containers se comuniquem entre si e com o mundo externo. Por padrão, o Docker cria uma rede isolada para cada container, mas você pode configurar redes personalizadas para controlar como os containers interagem.
+
+### Por que usar redes customizadas?
+
+- **Isolamento**: separe containers de diferentes aplicações em redes distintas
+- **Comunicação segura**: controle quais containers podem se comunicar
+- **Descoberta de serviços**: containers podem se comunicar usando nomes ao invés de IPs
+- **Flexibilidade**: configure diferentes topologias de rede conforme a necessidade
+
+### Tipos de rede no Docker
+
+#### 1. Bridge (Default)
+
+A rede padrão que conecta containers no mesmo host através de uma bridge virtual.
+
+**O que é uma bridge?**
+Uma bridge é como um **switch de rede virtual** criado pelo Docker. Tipo um switch físico onde você conecta vários dispositivos, a bridge funciona da mesma forma mas virtualmente, conectando containers entre si e permitindo que se comuniquem.
+
+**Características:**
+- Rede padrão para containers standalone
+- Containers podem se comunicar por IP (na rede bridge padrão) ou por nome (em redes customizadas)
+- Acesso externo via mapeamento de portas (`-p`)
+- Isolamento entre containers de diferentes redes bridge
+
+**Exemplo:**
+```sh
+# Container usa a rede bridge padrão
+docker run -d --name web nginx
+
+# Container com rede bridge customizada
+docker network create my-network
+docker run -d --name app --network my-network nginx
+```
 
 
 ## Glossário de Termos
