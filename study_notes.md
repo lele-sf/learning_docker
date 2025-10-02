@@ -340,6 +340,86 @@ docker network create my-network
 docker run -d --name app --network my-network nginx
 ```
 
+#### 2. Host
+
+Remove o isolamento de rede entre o container e o host Docker.
+
+**Características:**
+- Container compartilha a pilha de rede do host
+- Melhor performance (sem overhead de bridge)
+- Menos isolamento (container vê todas as interfaces do host)
+- Disponível apenas em hosts Linux
+
+**Exemplo:**
+```sh
+docker run -d --name app --network host nginx
+```
+
+#### 3. None
+
+Remove completamente a interface de rede do container.
+
+**Características:**
+- Container sem conectividade de rede externa
+- Máximo isolamento
+- Útil para containers que só processam dados locais
+
+**Exemplo:**
+```sh
+docker run -d --name isolated --network none alpine sleep 1000
+```
+
+#### 4. Overlay
+
+Conecta containers executando em diferentes hosts Docker, criando uma rede virtual distribuída.
+
+**Características:**
+- Usado em Docker Swarm ou clusters
+- Permite comunicação entre containers em hosts diferentes
+- Criptografia de tráfego automática
+- Descoberta de serviços integrada (containers encontram uns aos outros automaticamente)
+
+**Exemplo:**
+```sh
+# Requer Docker Swarm iniciado
+docker network create --driver overlay --attachable my-overlay
+```
+
+### Resumo: Quando usar cada tipo de rede
+
+| Tipo | Alcance | Caso de uso principal |
+|------|---------|---------------------|
+| **Bridge** | **Mesmo host** | Containers no mesmo servidor se comunicando |
+| **Host** | **Mesmo host** | Máxima performance, compartilha rede do host |
+| **None** | **Isolado** | Sem conectividade de rede |
+| **Overlay** | **Múltiplos hosts** | Containers em servidores diferentes se comunicando |
+
+### Gerenciando redes
+
+**Comandos básicos:**
+
+```sh
+# Listar redes
+docker network ls
+
+# Criar uma rede
+docker network create my-network
+
+# Inspecionar rede
+docker network inspect my-network
+
+# Conectar container a uma rede
+docker network connect my-network my-container
+
+# Desconectar container de uma rede
+docker network disconnect my-network my-container
+
+# Remover rede
+docker network rm my-network
+
+# Remover redes não utilizadas
+docker network prune
+```
 
 ## Glossário de Termos
 - **kernel**: é o núcleo do sistema operacional, responsável por gerenciar os recursos do sistema e permitir a comunicação entre o hardware e o software.
