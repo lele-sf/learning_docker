@@ -1,0 +1,37 @@
+services:
+  giropops-senha:
+    image: lelesf/giropops-senhas:4.0
+    ports:
+      - "5000:5000"
+    networks:
+      - giropops-net
+    environment:
+      REDIS_HOST: redis
+    volumes:
+      - data:/data
+    depends_on:
+      - redis
+    deploy:
+      resources:
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+        limits:
+          cpus: '0.5'
+          memory: 256M
+  redis:
+    image: redis:latest
+    ports:
+      - "6380:6379"
+    networks:
+      - giropops-net
+    volumes:
+      - redis-data:/data
+
+networks:
+  giropops-net:
+    driver: bridge
+
+volumes:
+  data:
+  redis-data:
