@@ -1,8 +1,6 @@
 services:
   giropops-senha:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: lelesf/giropops-senhas:4.0
     ports:
       - "5000:5000"
     networks:
@@ -21,10 +19,6 @@ services:
         limits:
           cpus: '0.5'
           memory: 256M
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
   redis:
     image: redis:latest
     command: ["redis-server", "--appendonly", "yes"]
