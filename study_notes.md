@@ -394,9 +394,7 @@ docker network create --driver overlay --attachable my-overlay
 | **None** | **Isolado** | Sem conectividade de rede |
 | **Overlay** | **Múltiplos hosts** | Containers em servidores diferentes se comunicando |
 
-### Gerenciando redes
-
-**Comandos básicos:**
+### Comandos básicos para gerenciar redes
 
 ```sh
 # Listar redes
@@ -419,6 +417,177 @@ docker network rm my-network
 
 # Remover redes não utilizadas
 docker network prune
+```
+
+## Docker Compose
+
+Docker Compose é uma ferramenta para definir e executar aplicações Docker multi-container. Com um único arquivo YAML, você configura todos os serviços da sua aplicação e, com um único comando, cria e inicia todos os containers definidos.
+
+### Por que usar Docker Compose?
+
+- **Simplificação**: defina toda a sua aplicação em um único arquivo declarativo
+- **Consistência**: garante que todos os componentes sejam executados com as configurações corretas
+- **Facilidade de manutenção**: alterações em sua infraestrutura ficam versionadas como código
+- **Automação**: inicie e pare múltiplos containers com um único comando
+- **Reutilização**: compartilhe composições entre ambientes de desenvolvimento, teste e produção
+
+### Componentes principais do Docker Compose
+
+#### 1. Arquivo docker-compose.yaml
+
+O arquivo `docker-compose.yaml` é o coração do Docker Compose. Ele define todos os serviços, redes, volumes e outras configurações necessárias para sua aplicação.
+
+**Estrutura básica**:
+```yaml
+services:        # Definição dos containers/serviços
+networks:        # Redes personalizadas
+volumes:         # Volumes persistentes
+```
+
+#### 2. Definição de Serviços
+
+Cada serviço representa um container que será executado como parte da sua aplicação.
+
+**Exemplo básico**:
+```yaml
+services:
+  webapp:                     # Nome do serviço
+    image: nginx:latest       # Imagem a ser usada
+    ports:
+      - "8080:80"             # Mapeamento de porta
+  database:
+    image: mysql:8.0          # Outro serviço na mesma composição
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+```
+
+### Principais recursos do Docker Compose
+
+#### 1. Builds personalizados
+
+Em vez de usar uma imagem existente, você pode construir uma imagem personalizada:
+
+```yaml
+services:
+  webapp:
+    build:                    # Em vez de image:
+      context: ./app          # Diretório contendo o Dockerfile
+      dockerfile: Dockerfile  # Nome do arquivo (opcional se for o padrão)
+      args:                   # Argumentos para o build
+        VERSION: '1.0'
+```
+
+#### 2. Redes
+
+Crie redes personalizadas para isolamento e comunicação entre serviços:
+
+```yaml
+services:
+  webapp:
+    networks:
+      - frontend
+  api:
+    networks:
+      - frontend
+      - backend
+  database:
+    networks:
+      - backend
+
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
+```
+
+#### 3. Volumes
+
+Volumes persistentes para armazenamento de dados:
+
+```yaml
+services:
+  database:
+    volumes:
+      - db-data:/var/lib/mysql    # Volume nomeado
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql  # Bind mount
+
+volumes:
+  db-data:    # Definição do volume nomeado
+```
+
+#### 4. Variáveis de ambiente e arquivos
+
+Configure serviços com variáveis de ambiente:
+
+```yaml
+services:
+  webapp:
+    environment:              # Variáveis inline
+      NODE_ENV: production
+      API_URL: http://api:3000
+    env_file:                 # Ou de um arquivo
+      - ./config.env
+```
+
+#### 5. Dependências entre serviços
+
+Defina a ordem de inicialização dos serviços:
+
+```yaml
+services:
+  webapp:
+    depends_on:
+      - api
+      - database
+```
+
+#### 6. Configuração de recursos e políticas de restart
+
+Controle de recursos e comportamento em caso de falha:
+
+```yaml
+services:
+  webapp:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+```
+
+### Comandos básicos do Docker Compose
+
+```sh
+# Iniciar todos os serviços definidos no docker-compose.yaml
+docker compose up
+
+# Iniciar em modo detached (background)
+docker compose up -d
+
+# Parar todos os serviços
+docker compose down
+
+# Ver logs de todos os serviços
+docker compose logs
+
+# Ver status dos serviços
+docker compose ps
+
+# Reiniciar um serviço específico
+docker compose restart api
+
+# Executar um comando em um serviço
+docker compose exec api bash
+
+# Construir ou reconstruir serviços
+docker compose build
+
+# Escalar um serviço para múltiplas instâncias
+docker compose up -d --scale api=3
 ```
 
 ## Glossário de Termos
